@@ -1,0 +1,204 @@
+Loading dataset from UCI...
+df = pd.read_csv(data_url)
+Dataset loaded successfully.
+Rows: 101766
+Columns: 48
+
+Cleaning data...
+Cleaning complete.
+
+Creating SQLite database...
+Database created.
+
+Creating encounters table...
+encounters table created.
+
+Creating diagnoses table...
+diagnoses table created.
+
+Creating medications table...
+medications table created.
+
+Creating lab_results table...
+lab_results table created.
+
+Checking database tables...
+          name
+0   encounters
+1    diagnoses
+2  medications
+3  lab_results
+
+Database setup complete.
+
+Running SQL Analysis...
+QUERY 1: READMISSION RATE BY AGE
+        age  total_encounters  readmitted_count  readmission_rate_pct
+0   [20-30)              1657               236                 14.24
+1   [80-90)             17197              2078                 12.08
+2   [70-80)             26068              3069                 11.77
+3   [30-40)              3775               424                 11.23
+4   [60-70)             22483              2502                 11.13
+5  [90-100)              2793               310                 11.10
+6   [40-50)              9685              1027                 10.60
+7   [50-60)             17256              1668                  9.67
+8   [10-20)               691                40                  5.79
+9    [0-10)               161                 3                  1.86
+QUERY 2: TOP DIAGNOSES
+  diagnosis_code  frequency
+0            428       6862
+1            414       6581
+2            786       4016
+3            410       3614
+4            486       3508
+5            427       2766
+6            491       2275
+7            715       2151
+8            682       2042
+9            434       2028
+QUERY 3: INSULIN ANALYSIS
+  insulin  patients  avg_days  avg_medications  readmit_rate_pct
+0      Up     11316      5.24            19.63             12.99
+1    Down     12218      4.92            19.02             13.90
+2  Steady     30849      4.36            16.29             11.13
+3      No     47383      4.08            14.21             10.04
+QUERY 4: A1C ANALYSIS
+  A1Cresult  encounters  avg_stay_days  readmit_rate_pct
+0        >7        3812           4.89             10.05
+1        >8        8216           4.75              9.87
+2      Norm        4990           4.92              9.66
+QUERY 5: HIGH RISK PATIENTS
+       age  number_diagnoses  number_emergency insulin  patient_count  readmit_rate_pct
+0  [20-30)                 9                 1  Steady             30             33.33
+1  [20-30)                 7                 3      Up             61             32.79
+2  [20-30)                 9                 1    Down             63             28.57
+3  [30-40)                 9                 1    Down             88             28.41
+4  [30-40)                 9                 4      Up            114             21.93
+5  [40-50)                 9                 1  Steady            246             20.33
+6  [80-90)                 8                 1    Down            203             19.70
+7  [30-40)                 9                 1  Steady             91             18.68
+8  [40-50)                 9                 1      Up            236             18.64
+9  [60-70)                 8                 1      Up            281             18.51
+
+Creating ML features using SQL...
+
+ML Dataset Created
+Rows: 101766
+Columns: 19
+Readmission Rate: 11.16 %
+
+First 5 Rows
+   encounter_id  time_in_hospital  num_lab_procedures  num_procedures  ...  a1c_abnormal  frequent_emergency  on_diabetes_med  readmitted_30
+0             1                 1                  41               0  ...             0                   0                0              0
+1             2                 3                  59               0  ...             0                   0                1              0
+2             3                 2                  11               5  ...             0                   0                1              0
+3             4                 2                  44               1  ...             0                   0                1              0
+4             5                 1                  51               0  ...             0                   0                1              0
+
+[5 rows x 19 columns]
+
+Column Names
+encounter_id
+time_in_hospital
+num_lab_procedures
+num_procedures
+num_medications
+number_outpatient
+number_emergency
+number_inpatient
+number_diagnoses
+total_prior_visits
+procedures_per_day
+meds_per_diagnosis
+elderly_flag
+insulin_adjusted
+a1c_tested
+a1c_abnormal
+frequent_emergency
+on_diabetes_med
+readmitted_30
+
+Starting Machine Learning...
+
+Features used:
+time_in_hospital
+num_lab_procedures
+num_procedures
+num_medications
+number_outpatient
+number_emergency
+number_inpatient
+number_diagnoses
+total_prior_visits
+procedures_per_day
+meds_per_diagnosis
+elderly_flag
+insulin_adjusted
+a1c_tested
+a1c_abnormal
+frequent_emergency
+on_diabetes_med
+
+Target:
+readmitted_30
+
+Creating Train/Test Split...
+Training rows: 81412
+Testing rows : 20354
+LOGISTIC REGRESSION
+Running Cross Validation...
+CV AUC: 0.6331314862822955 +/- 0.008203288996124804
+Training model...
+Test AUC: 0.6426592477716565
+                 precision    recall  f1-score   support
+
+ Not Readmitted       0.92      0.70      0.79     18083
+Readmitted <30d       0.17      0.49      0.25      2271
+
+       accuracy                           0.68     20354
+      macro avg       0.54      0.60      0.52     20354
+   weighted avg       0.83      0.68      0.73     20354
+
+RANDOM FOREST
+Running Cross Validation...
+CV AUC: 0.5908120476868872 +/- 0.0038427088474452956
+Training model...
+Test AUC: 0.5990837591123255
+                 precision    recall  f1-score   support
+
+ Not Readmitted       0.89      0.99      0.94     18083
+Readmitted <30d       0.18      0.02      0.03      2271
+
+       accuracy                           0.88     20354
+      macro avg       0.53      0.50      0.48     20354
+   weighted avg       0.81      0.88      0.84     20354
+
+XGBOOST
+Running Cross Validation...
+CV AUC: 0.5874529080168107 +/- 0.004162107957538185
+Training model...
+Test AUC: 0.6032997874934195
+                 precision    recall  f1-score   support
+
+ Not Readmitted       0.91      0.71      0.80     18083
+Readmitted <30d       0.16      0.44      0.23      2271
+
+       accuracy                           0.68     20354
+      macro avg       0.53      0.57      0.52     20354
+   weighted avg       0.83      0.68      0.74     20354
+
+MODEL COMPARISON
+Logistic Regression AUC: 0.6426592477716565
+Random Forest AUC: 0.5990837591123255
+XGBoost AUC: 0.6032997874934195
+
+Best Model:
+Logistic Regression
+Best AUC:
+0.6426592477716565
+
+Generating plots...
+
+Plot saved: project_results.png
+
+DONE!
